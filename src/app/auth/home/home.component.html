@@ -1,0 +1,138 @@
+<app-loader></app-loader>
+<div class="container-fluid">
+  <div class="background"></div>
+  <!-- <app-page-header [title]="'Module Selection'"></app-page-header> -->
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-justified">
+          <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+            {{ "client.Hi_Welcome" | translate }}
+            <span class="text-primary">{{ this.auth.getUserName() }}</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+       <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "client.Sign_Out" | translate }}
+      </button>
+    </div>  
+  </div>
+
+  <div class="col-lg-12 col-xl-12">
+    <div class="card custom-card" style="opacity: 0.7">
+      <div class="card-header">
+        <div class="card-title">
+          {{ "client.Module_Selection" | translate }}
+        </div>
+        <p>{{ "client.Module_Description" | translate }}</p>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <a routerLink="/trips">
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <img class="rounded-pill" src="./assets/icons/margin.png" alt="image" />
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Trips" | translate }}
+              </div>
+              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <a routerLink="/assignments">
+        <div class="card p-3">
+          <div class="card-body" style="align-self: center">
+            <div class="mb-3 text-center about-team">
+              <img class="rounded-pill" src="./assets/icons/operation.png" alt="image" />
+            </div>
+            <div class="tx-16 text-center font-weight-semibold">
+              {{ "Operations" | translate }}
+            </div>
+            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <div class="card p-3">
+          <!-- <label class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" name="example-checkbox2"
+              value="option2">
+          <span class="custom-control-label"></span>
+      </label> -->
+          <div class="card-body" style="align-self: center">
+            <div class="mb-3 text-center about-team">
+              <img class="rounded-pill" src="./assets/icons/clients.png" alt="image" />
+            </div>
+            <div class="tx-16 text-center font-weight-semibold">
+              {{ "Passangers" | translate }}
+            </div>
+            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <a routerLink="/drivers">
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <img class="rounded-pill" src="./assets/icons/margin.png" alt="image" />
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Drivers" | translate }}
+              </div>
+              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <div class="card p-3">
+          <div class="card-body" style="align-self: center">
+            <div class="mb-3 text-center about-team">
+              <img class="rounded-pill" src="./assets/icons/report.png" alt="image" />
+            </div>
+            <div class="tx-16 text-center font-weight-semibold">
+              {{ "Reporting" | translate }}
+            </div>
+            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
+        <a routerLink="/vehicles">
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <img class="rounded-pill" src="./assets/icons/administration.png" alt="image" />
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Vehicles" | translate }}
+              </div>
+              <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio21" checked>
+            <label class="btn btn-outline-primary" for="btnradio21">Radio 1</label>
+          </div> -->
+              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
+              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+   

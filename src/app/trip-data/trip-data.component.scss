@@ -1,0 +1,19 @@
+.trip-data-container {
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .global-search {
+    min-width: 220px;
+  }
+  .trip-link {
+    color: var(--primary-color, #1976d2);
+    text-decoration: underline;
+    cursor: pointer;
+    &:hover {
+      color: var(--primary-dark, #125ea2);
+    }
+  }
+}

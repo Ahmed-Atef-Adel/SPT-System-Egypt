@@ -1,0 +1,205 @@
+<app-loader></app-loader>
+
+<form [formGroup]="loginForm">
+  <div class="page">
+    <div class="page-single">
+      <div class="container">
+        <div class="row">
+          <div
+            class="col-xl-5 col-lg-6 col-md-8 col-sm-8 col-xs-10 card-sigin-main mx-auto my-auto py-4 justify-content-center"
+          >
+            <div class="card-sigin">
+              <div class="main-card-signin d-md-flex">
+                <div class="wd-100p">
+                  <!-- Header -->
+                  <div class="d-flex mb-4 align-items-center">
+                    <img
+                      src="./assets/img/brand/favicon.png"
+                      class="sign-favicon ht-40"
+                      alt="logo"
+                    />
+
+                    <div class="logo-text ms-2">
+                      <h2 class="mt-2">{{ "Trips" | translate }}</h2>
+                    </div>
+
+                    <div class="col d-flex justify-content-end">
+                      <img
+                        src="./assets/img/mastercard.png"
+                        class="sign-favicon mt-n2 ht-60"
+                        alt="logo"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Login Card -->
+                  <div class="">
+                    <div class="main-signup-header">
+                      <div class="d-flex justify-content-center">
+                        <h2>{{ "Welcome_Back" | translate }}</h2>
+                      </div>
+
+                      <div class="d-flex justify-content-center">
+                        <h6 class="font-weight-semibold mb-4">
+                          {{ "Please_Sign_In" | translate }}
+                        </h6>
+                      </div>
+
+                      <div class="panel panel-primary">
+                        <div class="panel-body tabs-menu-body border-0 p-3">
+                          <!-- User Name -->
+                          <div class="form-group mb-3">
+                            <label>
+                              {{ "User_Name" | translate }}
+                            </label>
+
+                            <input
+                              class="form-control"
+                              placeholder="{{
+                                'Enter-User-Name' | translate
+                              }}"
+                              type="text"
+                              formControlName="userName"
+                            />
+
+                            <div
+                              *ngIf="
+                                loginForm.controls['userName']?.touched &&
+                                loginForm.controls['userName']?.invalid
+                              "
+                              class="text-danger mt-1"
+                            >
+                              {{ "User_Name_Required" | translate }}
+                            </div>
+                          </div>
+
+                          <!-- Password -->
+                          <div class="form-group mb-3">
+                            <label>
+                              {{ "Password" | translate }}
+                            </label>
+
+                            <input
+                              class="form-control"
+                              placeholder="{{
+                                'Enter-User-Password' | translate
+                              }}"
+                              type="password"
+                              formControlName="password"
+                            />
+
+                            <div
+                              *ngIf="
+                                loginForm.controls['password']?.touched &&
+                                loginForm.controls['password']?.invalid
+                              "
+                              class="text-danger mt-1"
+                            >
+                              {{ "Password_is_required" | translate }}
+                            </div>
+                          </div>
+
+                          <!-- Driver Checkbox -->
+                          <div class="form-group mb-3">
+                            <div class="form-check">
+                              <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="isDriver"
+                                formControlName="isDriver"
+                              />
+
+                              <label
+                                class="form-check-label"
+                                for="isDriver"
+                              >
+                                {{ "IsDriver" | translate }}
+                              </label>
+                            </div>
+                          </div>
+
+                          <!-- Login Button -->
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-block w-100"
+                            autofocus
+                            [class.loader--text]="showLoader"
+                            [disabled]="!loginForm.valid || showLoader"
+                            (click)="login()"
+                          >
+                            {{ "SignIn" | translate }}
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Language Switch -->
+                      <div class="swichermainleft text-center mt-3">
+                        <div class="skin-body">
+                          <div class="switch_section">
+                            <!-- English -->
+                            <div
+                              class="switch-toggle justify-content-end"
+                              [ngClass]="
+                                translate.currentLang == 'ar'
+                                  ? 'd-flex'
+                                  : 'd-none'
+                              "
+                            >
+                              <span
+                                class="font-weight-bold"
+                                style="
+                                  cursor: pointer;
+                                  font-family: Gulzar;
+                                  font-size: 16px;
+                                "
+                                id="myonoffswitch54"
+                                name="onoffswitch25"
+                              >
+                                EN
+                              </span>
+                            </div>
+
+                            <!-- Arabic -->
+                            <div
+                              class="switch-toggle justify-content-end"
+                              [ngClass]="
+                                translate.currentLang == 'en'
+                                  ? 'd-flex'
+                                  : 'd-none'
+                              "
+                            >
+                              <span
+                                class="font-weight-bold"
+                                style="
+                                  cursor: pointer;
+                                  font-family: Gulzar;
+                                  font-size: 16px;
+                                "
+                                id="myonoffswitch55"
+                                name="onoffswitch25"
+                              >
+                                ع
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- End Language Switch -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Version -->
+        <div class="row d-flex justify-content-center mt-3">
+          <p class="tx-13 text-muted" style="color: black">
+            V. 20231106 B.2
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

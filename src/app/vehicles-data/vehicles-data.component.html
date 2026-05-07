@@ -1,0 +1,249 @@
+<app-loader></app-loader>
+<div class="container-fluid">
+  <div class="background"></div>
+
+  <!-- HEADER -->
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-justified">
+          <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+            {{ "Hi_Welcome" | translate }}
+            <span class="text-primary">{{ this.auth.getUserName() }}</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "Home" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- TITLE CARD -->
+  <div class="col-lg-12 col-xl-12">
+    <div class="card custom-card" style="opacity: 0.7">
+      <div class="card-header">
+        <div class="card-title">{{ "Vehicles" | translate }}</div>
+        <p>{{ "Vehicles_Description" | translate }}</p>
+      </div>
+    </div>
+
+    <!-- TABLE CONTAINER -->
+    <div class="trip-data-container">
+
+      <!-- HEADER ACTIONS: Search LEFT, Add New RIGHT -->
+      <div class="table-header d-flex align-items-center justify-content-between mb-3">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search vehicles..."
+            [(ngModel)]="globalFilter"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            class="global-search"
+          />
+        </span>
+        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
+          <i class="pi pi-plus"></i>&nbsp;{{ 'Add New' | translate }}
+        </button>
+      </div>
+
+      <!-- TABLE -->
+      <p-table
+        #dt
+        [value]="vehicles"
+        [paginator]="true"
+        [rows]="10"
+        [sortMode]="'multiple'"
+        [globalFilterFields]="[
+          'name','number','chassisNo','licenseNumber',
+          'modelNumber','typeName','manufacturingYear',
+          'seatCount','condition','motorNumber'
+        ]"
+        class="p-datatable-striped"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="number">Number <p-sortIcon field="number"></p-sortIcon></th>
+            <th>Chassis No</th>
+            <th>License No</th>
+            <th pSortableColumn="licenseExpiry">License Expiry <p-sortIcon field="licenseExpiry"></p-sortIcon></th>
+            <th>Model</th>
+            <th>Type</th>
+            <th pSortableColumn="manufacturingYear">Year <p-sortIcon field="manufacturingYear"></p-sortIcon></th>
+            <th>Seats</th>
+            <th>Condition</th>
+            <th>Available</th>
+            <th>Motor No</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-vehicle>
+          <tr>
+            <td>{{ vehicle.name }}</td>
+            <td>{{ vehicle.number }}</td>
+            <td>{{ vehicle.chassisNo }}</td>
+            <td>{{ vehicle.licenseNumber }}</td>
+            <td [class.text-danger]="isLicenseExpired(vehicle.licenseExpiry)">
+              {{ vehicle.licenseExpiry | date }}
+              <i
+                *ngIf="isLicenseExpired(vehicle.licenseExpiry)"
+                class="pi pi-exclamation-triangle ml-1"
+                title="License Expired"
+              ></i>
+            </td>
+            <td>{{ vehicle.modelNumber }}</td>
+            <td>{{ vehicle.typeName }}</td>
+            <td>{{ vehicle.manufacturingYear }}</td>
+            <td>{{ vehicle.seatCount }}</td>
+            <td>
+              <p-badge
+                [value]="vehicle.condition"
+                [severity]="getConditionSeverity(vehicle.condition)"
+              ></p-badge>
+            </td>
+            <td>
+              <p-badge
+                [value]="vehicle.inMaintenance ? 'In Maintenance' : 'Available'"
+                [severity]="vehicle.inMaintenance ? 'danger' : 'success'"
+              ></p-badge>
+            </td>
+            <td>{{ vehicle.motorNumber }}</td>
+            <td>
+              <!-- Edit -->
+              <button
+                pButton type="button"
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-info mr-1"
+                title="Edit Vehicle"
+                (click)="confirmEdit(vehicle)"
+              ></button>
+              <!-- Delete -->
+              <button
+                pButton type="button"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger mr-1"
+                title="Delete Vehicle"
+                (click)="confirmDelete(vehicle)"
+              ></button>
+              <!-- Maintenance toggle -->
+              <button
+                pButton type="button"
+                [icon]="vehicle.inMaintenance ? 'pi pi-check' : 'pi pi-wrench'"
+                [class]="vehicle.inMaintenance
+                  ? 'p-button-rounded p-button-text p-button-success'
+                  : 'p-button-rounded p-button-text p-button-warning'"
+                [title]="vehicle.inMaintenance ? 'Mark Available' : 'Send to Maintenance'"
+                (click)="confirmMaintenance(vehicle)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="13" class="text-center">No vehicles found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-toast></p-toast>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Add / Edit Vehicle — pure CSS modal (no p-dialog dependency)
+============================================================ -->
+<div *ngIf="showDialog" class="custom-modal-overlay" (click)="onOverlayClick($event)">
+  <div class="custom-modal-box">
+
+    <!-- Header -->
+    <div class="custom-modal-header">
+      <h5 class="mb-0">{{ isEditMode ? 'Edit Vehicle' : 'Add New Vehicle' }}</h5>
+      <button type="button" class="custom-modal-close" (click)="closeDialog()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="custom-modal-body">
+      <div class="p-field mb-3">
+        <label for="vName">Name</label>
+        <input id="vName" type="text" class="form-control" [(ngModel)]="vehicleForm.name" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vNumber">Number</label>
+        <input id="vNumber" type="text" class="form-control" [(ngModel)]="vehicleForm.number" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vChassisNo">Chassis No</label>
+        <input id="vChassisNo" type="text" class="form-control" [(ngModel)]="vehicleForm.chassisNo" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vLicenseNumber">License No</label>
+        <input id="vLicenseNumber" type="text" class="form-control" [(ngModel)]="vehicleForm.licenseNumber" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vLicenseExpiry">License Expiry</label>
+        <input id="vLicenseExpiry" type="date" class="form-control" [(ngModel)]="vehicleForm.licenseExpiryStr" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vModelNumber">Model Number</label>
+        <input id="vModelNumber" type="text" class="form-control" [(ngModel)]="vehicleForm.modelNumber" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vTypeName">Type</label>
+        <input id="vTypeName" type="text" class="form-control" [(ngModel)]="vehicleForm.typeName" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vYear">Manufacturing Year</label>
+        <input id="vYear" type="number" class="form-control" [(ngModel)]="vehicleForm.manufacturingYear" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vSeats">Seat Count</label>
+        <input id="vSeats" type="number" class="form-control" [(ngModel)]="vehicleForm.seatCount" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="vCondition">Condition</label>
+        <select id="vCondition" class="form-control" [(ngModel)]="vehicleForm.condition">
+          <option value="Good">Good</option>
+          <option value="Average">Average</option>
+          <option value="Bad">Bad</option>
+        </select>
+      </div>
+      <div class="p-field mb-3">
+        <label for="vMotorNumber">Motor Number</label>
+        <input id="vMotorNumber" type="text" class="form-control" [(ngModel)]="vehicleForm.motorNumber" />
+      </div>
+      <div class="p-field mb-3 d-flex align-items-center">
+        <input
+          type="checkbox"
+          id="vInMaintenance"
+          [checked]="vehicleForm.inMaintenance"
+          (change)="vehicleForm.inMaintenance = $any($event.target).checked"
+          style="width:18px; height:18px; cursor:pointer;"
+        />
+        <label for="vInMaintenance" class="mb-0 ml-2">In Maintenance</label>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="closeDialog()">
+        <i class="pi pi-times mr-1"></i> Cancel
+      </button>
+      <button type="button" class="btn btn-success" (click)="saveVehicle()">
+        <i class="pi pi-check mr-1"></i>
+        {{ isEditMode ? 'Save Changes' : 'Add Vehicle' }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,364 @@
+<app-loader></app-loader>
+<div class="container-fluid">
+  <div class="background"></div>
+
+  <!-- Header -->
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+          {{ "Hi_Welcome" | translate }}
+          <span class="text-primary">{{ this.auth.getUserName() }}</span>
+        </h3>
+      </div>
+    </div>
+    <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "Home" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="col-lg-12 col-xl-12">
+    <div class="card custom-card" style="opacity: 0.7">
+      <div class="card-header">
+        <div class="card-title">{{ "Trip Assignments" | translate }}</div>
+        <p>{{ "Trip_Assignments_Description" | translate }}</p>
+      </div>
+    </div>
+
+    <div class="trip-data-container">
+      <div class="table-header d-flex align-items-center justify-content-between mb-3">
+        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
+          <i class="pi pi-plus"></i> {{ 'New Assignment' | translate }}
+        </button>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search assignments..."
+            [(ngModel)]="globalFilter"
+            class="global-search"
+          />
+        </span>
+      </div>
+
+      <p-table
+        #dt
+        [value]="assignments"
+        [paginator]="true"
+        [rows]="10"
+        [sortMode]="'multiple'"
+        [globalFilterFields]="['tripName','tripDuration','tripStatus','driver.driverName','vehicle.vehicleName']"
+        class="p-datatable-striped"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="tripName">
+              Trip Name <p-sortIcon field="tripName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tripDuration">
+              Duration <p-sortIcon field="tripDuration"></p-sortIcon>
+            </th>
+            <th>Passenger Count</th>
+            <th pSortableColumn="driver.driverName">
+              Driver <p-sortIcon field="driver.driverName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="vehicle.vehicleName">
+              Vehicle <p-sortIcon field="vehicle.vehicleName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tripStatus">
+              Status <p-sortIcon field="tripStatus"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-assignment>
+          <tr>
+
+            <!-- Trip Name → trip modal -->
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="text-primary fw-semibold"
+                (click)="openTripModal(assignment)"
+              
+              >
+                {{ assignment.tripName }}
+              </a>
+            </td>
+
+            <td>{{ assignment.tripDuration }}</td>
+
+            <!-- Passenger Count → passenger modal -->
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="text-primary fw-semibold"
+                (click)="openPassengerModal(assignment.passengers)"
+             
+              >
+                {{ assignment.passengerCount }}
+                <i class="pi pi-users ms-1" style="font-size: 0.8rem;"></i>
+              </a>
+            </td>
+
+            <!-- Driver → driver modal -->
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="text-primary fw-semibold"
+                (click)="openDriverModal(assignment.driver)"
+             
+              >
+                {{ assignment.driver.driverName }}
+                <i class="pi pi-user ms-1" style="font-size: 0.8rem;"></i>
+              </a>
+            </td>
+
+            <!-- Vehicle → vehicle modal -->
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="text-primary fw-semibold"
+                (click)="openVehicleModal(assignment.vehicle)"
+                
+              >
+                {{ assignment.vehicle.vehicleName }}
+                <i class="pi pi-car ms-1" style="font-size: 0.8rem;"></i>
+              </a>
+            </td>
+
+            <!-- Status — last before actions -->
+            <td>
+              <p-badge
+                [value]="assignment.tripStatus"
+                [severity]="getStatusSeverity(assignment.tripStatus)"
+              ></p-badge>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-user-edit"
+                class="p-button-rounded p-button-text p-button-info mr-1"
+                title="Change Driver"
+                (click)="confirmChangeDriver(assignment)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-car"
+                class="p-button-rounded p-button-text p-button-warning mr-1"
+                title="Change Vehicle"
+                (click)="confirmChangeVehicle(assignment)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-refresh"
+                class="p-button-rounded p-button-text p-button-success"
+                title="Change Status"
+                (click)="confirmChangeStatus(assignment)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center">No assignments found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-toast></p-toast>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  TRIP DETAIL MODAL                                         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="tripModal" tabindex="-1" aria-labelledby="tripModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tripModalLabel">
+          <i class="pi pi-map-marker me-2 text-primary"></i> Trip Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedTrip">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item px-0">
+            <strong>Trip Name: </strong>{{ selectedTrip.tripName }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Duration: </strong>{{ selectedTrip.tripDuration }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Passenger Count: </strong>{{ selectedTrip.passengerCount }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Driver: </strong>{{ selectedTrip.driver.driverName }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Vehicle: </strong>{{ selectedTrip.vehicle.vehicleName }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Status: </strong>{{ selectedTrip.tripStatus }}
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  DRIVER DETAIL MODAL                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="driverModal" tabindex="-1" aria-labelledby="driverModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="driverModalLabel">
+          <i class="pi pi-user me-2 text-primary"></i> Driver Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedDriver">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item px-0">
+            <strong>Driver Name: </strong>{{ selectedDriver.driverName }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>License ID: </strong>{{ selectedDriver.licenseId }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>ID Number: </strong>{{ selectedDriver.idNumber }}
+          </li>
+          <li class="list-group-item px-0"
+              [class.text-danger]="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)">
+            <strong>License Expiry: </strong>{{ selectedDriver.licenseExpiredDate }}
+            <i *ngIf="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)"
+               class="pi pi-exclamation-triangle ms-1"></i>
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Address: </strong>{{ selectedDriver.address }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Hiring Date: </strong>{{ selectedDriver.hiringDate }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Chronic Disease: </strong>
+            <span class="badge ms-1"
+              [class.bg-warning]="selectedDriver.hasChronicDisease"
+              [class.bg-success]="!selectedDriver.hasChronicDisease">
+              {{ selectedDriver.hasChronicDisease ? 'Yes' : 'No' }}
+            </span>
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Blocked: </strong>
+            <span class="badge ms-1"
+              [class.bg-danger]="selectedDriver.isBlocked"
+              [class.bg-success]="!selectedDriver.isBlocked">
+              {{ selectedDriver.isBlocked ? 'Yes' : 'No' }}
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  VEHICLE DETAIL MODAL                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vehicleModalLabel">
+          <i class="pi pi-car me-2 text-primary"></i> Vehicle Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedVehicle">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item px-0">
+            <strong>Vehicle Name: </strong>{{ selectedVehicle.vehicleName }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Plate Number: </strong>{{ selectedVehicle.plateNumber }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Model: </strong>{{ selectedVehicle.model }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Year: </strong>{{ selectedVehicle.year }}
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Capacity: </strong>{{ selectedVehicle.capacity }} seats
+          </li>
+          <li class="list-group-item px-0">
+            <strong>Status: </strong>
+            <span class="badge ms-1"
+              [class.bg-success]="selectedVehicle.status === 'Active'"
+              [class.bg-danger]="selectedVehicle.status !== 'Active'">
+              {{ selectedVehicle.status }}
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PASSENGER LIST MODAL                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passengerModalLabel">
+          <i class="pi pi-users me-2 text-primary"></i> Passenger List
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group list-group-flush" *ngIf="selectedPassengers.length > 0; else noPassengers">
+          <li
+            class="list-group-item px-0"
+            *ngFor="let passenger of selectedPassengers; let i = index"
+          >
+            <strong>#{{ i + 1 }} &nbsp;|&nbsp; Name: </strong>{{ passenger.name }}
+            &nbsp;&nbsp;<strong>Phone: </strong>{{ passenger.phone }}
+            &nbsp;&nbsp;<strong>Seat: </strong>{{ passenger.seat }}
+          </li>
+        </ul>
+        <ng-template #noPassengers>
+          <p class="text-center text-muted mb-0">No passengers found.</p>
+        </ng-template>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>  

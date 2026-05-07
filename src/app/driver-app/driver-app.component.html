@@ -1,0 +1,475 @@
+<app-loader></app-loader>
+
+<div class="container-fluid">
+  <div class="background"></div>
+
+  <!-- Header -->
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-justified">
+          <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+            {{ "Hi_Welcome" | translate }}
+            <span class="text-primary">
+              {{ this.auth.getUserName() }}
+            </span>
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "Home" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="col-lg-12 col-xl-12">
+
+    <div class="card custom-card mb-3" style="opacity: 0.9">
+      <div class="card-header">
+
+        <div class="card-title">
+          {{ "Trips" | translate }}
+        </div>
+
+        <p>
+          {{ "Trips_Description" | translate }}
+        </p>
+
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="trip-data-container">
+
+      <!-- Top Actions -->
+      <div
+        class="table-header d-flex justify-content-between align-items-center mb-3"
+      >
+
+        <!-- Add New -->
+        <button
+          pButton
+          type="button"
+          class="p-button-success"
+          (click)="onAddNew()"
+        >
+          <i class="pi pi-plus mr-2"></i>
+          {{ "Read Ticket" | translate }}
+        </button>
+
+        <!-- Search -->
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+
+          <input
+            pInputText
+            type="text"
+            placeholder="Search trips..."
+            [(ngModel)]="globalFilter"
+(input)="dt.filterGlobal(($any($event.target)).value, 'contains')"            class="global-search"
+          />
+        </span>
+
+      </div>
+
+      <!-- Table -->
+   <p-table
+  #dt
+  [value]="trips"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[5,10,20,50]"
+  [sortMode]="'multiple'"
+  [globalFilterFields]="[
+    'name',
+    'startTime',
+    'endTime',
+    'stopsCount',
+    'expectedCount',
+    'actualPassengerCount',
+    'status'
+  ]"
+  responsiveLayout="scroll"
+  class="p-datatable-striped p-datatable-gridlines"
+>
+
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <tr>
+
+      <th pSortableColumn="name">
+        Trip Name
+        <p-sortIcon field="name"></p-sortIcon>
+      </th>
+
+      <th pSortableColumn="startTime">
+        Start Time
+        <p-sortIcon field="startTime"></p-sortIcon>
+      </th>
+
+      <th pSortableColumn="endTime">
+        End Time
+        <p-sortIcon field="endTime"></p-sortIcon>
+      </th>
+
+      <th>
+        Duration
+      </th>
+
+      <th pSortableColumn="stopsCount">
+        Stops Count
+        <p-sortIcon field="stopsCount"></p-sortIcon>
+      </th>
+
+      <th pSortableColumn="expectedCount">
+        Passenger Count
+        <p-sortIcon field="expectedCount"></p-sortIcon>
+      </th>
+
+      <th pSortableColumn="actualPassengerCount">
+        Actual Passenger Count
+        <p-sortIcon field="actualPassengerCount"></p-sortIcon>
+      </th>
+
+      
+
+      <th pSortableColumn="status">
+        Status
+        <p-sortIcon field="status"></p-sortIcon>
+      </th>
+
+      <th class="text-center">
+        Actions
+      </th>
+
+    </tr>
+  </ng-template>
+
+  <!-- Body -->
+  <ng-template
+    pTemplate="body"
+    let-trip
+  >
+    <tr>
+
+      <!-- Trip Name -->
+      <td>
+        <div class="font-weight-bold">
+          {{ trip.name }}
+        </div>
+      </td>
+
+      <!-- Start Time -->
+      <td>
+        {{ trip.startTime }}
+      </td>
+
+      <!-- End Time -->
+      <td>
+        {{ trip.endTime }}
+      </td>
+
+      <!-- Duration -->
+      <td>
+        {{ getDuration(trip) }}
+      </td>
+
+      <!-- Stops -->
+      <td>
+        {{ trip.stopsCount }}
+      </td>
+
+      <!-- Passenger Count -->
+      <td>
+        {{ trip.expectedCount }}
+      </td>
+
+      <!-- Actual Passenger Count -->
+      <td>
+        {{ trip.actualPassengerCount || 0 }}
+      </td>
+
+ 
+      <!-- Status -->
+      <td>
+
+        <p-badge
+          [value]="trip.status"
+          [severity]="getStatusSeverity(trip.status)"
+        >
+        </p-badge>
+
+      </td>
+
+      <!-- Actions -->
+      <td>
+
+        <div class="d-flex align-items-center gap-2">
+
+          <!-- Start Trip -->
+          <button
+            *ngIf="trip.status === 'Pending'"
+            pButton
+            type="button"
+            icon="pi pi-play"
+            class="p-button-rounded p-button-success p-button-text mr-1"
+            pTooltip="Start Trip"
+            tooltipPosition="top"
+            (click)="startTrip(trip)"
+          >
+          </button>
+
+          <!-- End Trip -->
+          <button
+            *ngIf="trip.status === 'Started'"
+            pButton
+            type="button"
+            icon="pi pi-check"
+            class="p-button-rounded p-button-primary p-button-text mr-1"
+            pTooltip="End Trip"
+            tooltipPosition="top"
+            (click)="endTrip(trip)"
+          >
+          </button>
+
+          <!-- Cancel Trip -->
+          <button
+            *ngIf="
+              trip.status !== 'Cancelled' &&
+              trip.status !== 'Ended'
+            "
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-danger p-button-text"
+            pTooltip="Cancel Trip"
+            tooltipPosition="top"
+            (click)="openCancelDialog(trip)"
+          >
+          </button>
+
+        </div>
+
+      </td>
+
+    </tr>
+  </ng-template>
+
+  <!-- Empty Message -->
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="10" class="text-center py-4">
+        No trips found.
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>
+
+      <!-- ===================================== -->
+      <!-- Ticket Reader Dialog -->
+      <!-- ===================================== -->
+
+      <p-dialog
+        header="Read Ticket"
+        [visible]="ticketDialog"
+        (onHide)="ticketDialog = false"
+        [modal]="true"
+        [style]="{ width: '500px' }"
+        [closable]="true"
+        [draggable]="false"
+        [resizable]="false"
+      >
+
+        <div class="p-fluid">
+
+          <div class="field mb-3">
+
+            <label class="font-weight-bold mb-2 d-block">
+              Barcode Reader
+            </label>
+
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="ticketBarcode"
+              placeholder="Scan barcode here..."
+              class="w-100"
+              autofocus
+              (keyup.enter)="readTicket()"
+            />
+
+            <small class="text-muted">
+              Use barcode scanner or enter ticket code manually
+            </small>
+
+          </div>
+
+          <!-- Ticket Result -->
+          <div
+            *ngIf="ticketData"
+            class="card border-0 shadow-sm p-3 mt-3"
+          >
+
+            <h5 class="mb-3 text-primary">
+              Ticket Information
+            </h5>
+
+            <div class="row mb-2">
+
+              <div class="col-5 font-weight-bold">
+                Ticket Number:
+              </div>
+
+              <div class="col-7">
+                {{ ticketData.ticketNumber }}
+              </div>
+
+            </div>
+
+            <div class="row mb-2">
+
+              <div class="col-5 font-weight-bold">
+                Passenger:
+              </div>
+
+              <div class="col-7">
+                {{ ticketData.passengerName }}
+              </div>
+
+            </div>
+
+            <div class="row mb-2">
+
+              <div class="col-5 font-weight-bold">
+                Seat Number:
+              </div>
+
+              <div class="col-7">
+                {{ ticketData.seatNumber }}
+              </div>
+
+            </div>
+
+            <div class="row mb-2">
+
+              <div class="col-5 font-weight-bold">
+                Status:
+              </div>
+
+              <div class="col-7">
+
+                <p-badge
+                  [value]="ticketData.status"
+                  severity="success"
+                >
+                </p-badge>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+
+          <button
+            pButton
+            type="button"
+            label="Close"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="ticketDialog = false"
+          >
+          </button>
+
+          <button
+            pButton
+            type="button"
+            label="Read Ticket"
+            icon="pi pi-search"
+            class="p-button-warning"
+            [disabled]="!ticketBarcode"
+            (click)="readTicket()"
+          >
+          </button>
+
+        </ng-template>
+
+      </p-dialog>
+
+      <!-- ===================================== -->
+      <!-- Cancel Dialog -->
+      <!-- ===================================== -->
+
+      <p-dialog
+        header="Cancel Trip"
+      [visible]="cancelDialog"
+(onHide)="cancelDialog = false"
+        [modal]="true"
+        [style]="{ width: '450px' }"
+        [closable]="true"
+        [draggable]="false"
+        [resizable]="false"
+      >
+
+        <div class="mb-3">
+
+          <label class="font-weight-bold mb-2 d-block">
+            Cancellation Reason
+          </label>
+
+          <textarea
+            rows="5"
+            pInputTextarea
+            [(ngModel)]="cancelReason"
+            class="w-100"
+            placeholder="Enter cancellation reason..."
+          >
+          </textarea>
+
+        </div>
+
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+
+          <button
+            pButton
+            type="button"
+            label="Close"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="cancelDialog = false"
+          >
+          </button>
+
+          <button
+            pButton
+            type="button"
+            label="Confirm Cancel"
+            icon="pi pi-check"
+            class="p-button-danger"
+            [disabled]="!cancelReason"
+            (click)="confirmCancelTrip()"
+          >
+          </button>
+
+        </ng-template>
+
+      </p-dialog>
+
+      <!-- PrimeNG Components -->
+      <p-confirmDialog></p-confirmDialog>
+
+      <p-toast></p-toast>
+
+    </div>
+  </div>
+</div>

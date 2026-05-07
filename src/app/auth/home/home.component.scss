@@ -1,0 +1,27 @@
+.background {
+    background-image: linear-gradient(rgba(250, 250, 250, 0) 0%, rgba(250, 250, 250, 0.024) 5.26%, rgba(250, 250, 250, 0.055) 9.79%, rgba(250, 250, 250, 0.098) 13.69%, rgba(250, 250, 250, 0.145) 17.08%, rgba(250, 250, 250, 0.2) 20.04%, rgba(250, 250, 250, 0.267) 22.7%, rgba(250, 250, 250, 0.333) 25.16%, rgba(250, 250, 250, 0.408) 27.51%, rgba(250, 250, 250, 0.486) 29.87%, rgba(250, 250, 250, 0.57) 32.34%, rgba(250, 250, 250, 0.65) 35.02%, rgba(250, 250, 250, 0.737) 38.02%, rgba(250, 250, 250, 0.824) 41.45%, rgba(250, 250, 250, 0.914) 45.41%, rgb(250, 250, 250) 50%), url('/assets/background.jpg');
+    box-sizing: border-box;
+    transform: scale(1);
+    opacity: 0.9;
+    transition-timing-function: cubic-bezier(0.5, 0, 0.23, 0.99), linear;
+    transition-duration: 1s;
+    background-position: center top;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: clamp(460px, 50vw, 100%);
+    transition-property: transform, opacity;
+    width: 100%;
+    background-color: var(--colorNeutralBackground2);
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.rounded-pill:hover {
+    transition: all .2s ease-in-out;
+    transform: scale(1.1);
+}
+
+.rounded-pill {
+    transition: all .2s ease-in-out;
+}

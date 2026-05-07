@@ -1,0 +1,125 @@
+<app-loader></app-loader>
+<div class="container-fluid">
+  <div class="background"></div>
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-justified">
+          <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+            {{ "Hi_Welcome" | translate }}
+            <span class="text-primary">{{ this.auth.getUserName() }}</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "Home" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="col-lg-12 col-xl-12">
+    <div class="card custom-card" style="opacity: 0.7">
+      <div class="card-header">
+        <div class="card-title">
+          {{ "Trips" | translate }}
+        </div>
+        <p>{{ "Trips_Description" | translate }}</p>
+      </div>
+    </div>
+
+    <div class="trip-data-container">
+      <div class="table-header flex align-items-center justify-content-between mb-3">
+        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
+          <i class="pi pi-plus"></i> {{ 'Add New' | translate }}
+        </button>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search trips..." [(ngModel)]="globalFilter" class="global-search" />
+        </span>
+      </div>
+
+      <p-table
+        #dt
+        [value]="trips"
+        [paginator]="true"
+        [rows]="10"
+        [sortMode]="'multiple'"
+        [globalFilterFields]="['name','startTime','endTime','startDate','endDate','stopsCount','expectedCount','price','tripCountPerDay','status']"
+        class="p-datatable-striped"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">
+              Trip Name <p-sortIcon field="name"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startTime">
+              Start Time <p-sortIcon field="startTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endTime">
+              End Time <p-sortIcon field="endTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startDate">
+              Start Date <p-sortIcon field="startDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endDate">
+              End Date <p-sortIcon field="endDate"></p-sortIcon>
+            </th>
+            <th>Duration</th>
+            <th pSortableColumn="stopsCount">
+              Stops Count <p-sortIcon field="stopsCount"></p-sortIcon>
+            </th>
+            <th pSortableColumn="expectedCount">
+              Expected Count <p-sortIcon field="expectedCount"></p-sortIcon>
+            </th>
+            <th pSortableColumn="price">
+              Price <p-sortIcon field="price"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tripCountPerDay">
+              Trip Count/Day <p-sortIcon field="tripCountPerDay"></p-sortIcon>
+            </th>
+            <th pSortableColumn="status">
+              Status <p-sortIcon field="status"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-trip let-rowIndex="rowIndex">
+          <tr>
+            <td>
+              <a [routerLink]="['/trips', trip.id]" class="trip-link">{{ trip.name }}</a>
+            </td>
+            <td>{{ trip.startTime }}</td>
+            <td>{{ trip.endTime }}</td>
+            <td>{{ trip.startDate }}</td>
+            <td>{{ trip.endDate }}</td>
+            <td>{{ getDuration(trip) }}</td>
+            <td>{{ trip.stopsCount }}</td>
+            <td>{{ trip.expectedCount }}</td>
+            <td>{{ trip.price | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ trip.tripCountPerDay }}</td>
+            <td>
+              <p-badge [value]="trip.status" [severity]="getStatusSeverity(trip.status)"></p-badge>
+            </td>
+            <td>
+              <button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info mr-1" title="Edit Trip" (click)="confirmEdit(trip)"></button>
+              <button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger mr-1" title="Delete Trip" (click)="confirmDelete(trip)"></button>
+              <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-text p-button-warning mr-1" title="Update Status" (click)="confirmUpdateStatus(trip)"></button>
+              <button pButton type="button" icon="pi pi-cog" class="p-button-rounded p-button-text p-button-success" title="Operate Trip" (click)="confirmOperate(trip)"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="12" class="text-center">No trips found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-confirmDialog></p-confirmDialog>
+      <p-toast></p-toast>
+    </div>
+  </div>
+</div>
