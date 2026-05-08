@@ -4,7 +4,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from 'src/app/shared/guard/auth.service';
 import Swal from 'sweetalert2';
 import { Table } from 'primeng/table';
-import { getDate } from 'ngx-bootstrap/chronos/utils/date-getters';
 
 interface Trip {
   id: number;
@@ -12,15 +11,17 @@ interface Trip {
   startTime: string;
   endTime: string;
   stopsCount: number;
-  PassagnerCount: number;
-  AcutalPassagnerCount: number;
-  status:
-    | 'Pending'
-    | 'Started'
-    | 'Ended'
-    | 'Cancelled';
-
+  expectedCount: number;
+  actualPassengerCount: number;
+  status: 'Pending' | 'Started' | 'Ended' | 'Cancelled';
   cancelReason?: string;
+}
+
+interface TicketData {
+  ticketNumber: string;
+  passengerName: string;
+  seatNumber: string;
+  status: string;
 }
 
 @Component({
@@ -32,9 +33,7 @@ export class DriverAppComponent {
 
   @ViewChild('dt') dt!: Table;
 
-  // =========================
-  // Trips Data
-  // =========================
+  // ── Data ──────────────────────────────────────────────────────
 
   trips: Trip[] = [
     {
@@ -43,9 +42,9 @@ export class DriverAppComponent {
       startTime: '08:00',
       endTime: '18:00',
       stopsCount: 4,
-      status: 'Pending',
-      AcutalPassagnerCount : 0,
-      PassagnerCount : 3
+      expectedCount: 30,
+      actualPassengerCount: 0,
+      status: 'Pending'
     },
     {
       id: 2,
@@ -53,288 +52,225 @@ export class DriverAppComponent {
       startTime: '10:00',
       endTime: '20:00',
       stopsCount: 7,
-      status: 'Started',
-        AcutalPassagnerCount : 0,
-      PassagnerCount : 3
+      expectedCount: 45,
+      actualPassengerCount: 12,
+      status: 'Started'
+    },
+    {
+      id: 3,
+      name: 'School Excursion',
+      startTime: '07:00',
+      endTime: '15:00',
+      stopsCount: 3,
+      expectedCount: 50,
+      actualPassengerCount: 50,
+      status: 'Ended'
+    },
+    {
+      id: 4,
+      name: 'Airport Transfer',
+      startTime: '06:00',
+      endTime: '08:00',
+      stopsCount: 1,
+      expectedCount: 10,
+      actualPassengerCount: 0,
+      status: 'Cancelled',
+      cancelReason: 'Vehicle breakdown — maintenance required.'
     }
   ];
 
-  globalFilter: string = '';
+  globalFilter = '';
+  selectedTrip: Trip | null = null;
 
-  // =========================
-  // Cancel Dialog
-  // =========================
+  // ── Ticket modal ──────────────────────────────────────────────
 
-  cancelDialog: boolean = false;
+  showTicketModal = false;
+  ticketBarcode   = '';
+  ticketData: TicketData | null = null;
 
-  cancelReason: string = '';
+  // ── Cancel modal ──────────────────────────────────────────────
 
-  selectedTrip!: Trip;
+  showCancelModal = false;
+  cancelReason    = '';
 
-  // =========================
-  // Ticket Reader
-  // =========================
+  // ── Reason view modal ─────────────────────────────────────────
 
-  ticketDialog: boolean = false;
-
-  ticketBarcode: string = '';
-
-  ticketData: any = null;
+  showReasonModal = false;
 
   constructor(
     private router: Router,
-    public auth: AuthService,
+    public  auth: AuthService,
     private translate: TranslateService
   ) {}
 
-  // =========================
-  // Duration
-  // =========================
+  // ── Duration helper ───────────────────────────────────────────
 
   getDuration(trip: Trip): string {
-
-   const today = new Date();
-
-const datePart = today.toISOString().split('T')[0]; // YYYY-MM-DD
-
-const start = new Date(`${datePart}T${trip.startTime}`);
-const end = new Date(`${datePart}T${trip.endTime}`);
-
-const diffMs = end.getTime() - start.getTime();
-
-const hours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    return `${hours}h`;
+    const today    = new Date().toISOString().split('T')[0];
+    const start    = new Date(`${today}T${trip.startTime}`);
+    const end      = new Date(`${today}T${trip.endTime}`);
+    const diffMs   = end.getTime() - start.getTime();
+    const hours    = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes  = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
   }
 
-  // =========================
-  // Generate Next ID
-  // =========================
+  // ── Ticket modal ──────────────────────────────────────────────
 
-  private getNextId(): number {
-
-    return this.trips.length > 0
-      ? Math.max(...this.trips.map(t => t.id)) + 1
-      : 1;
-  }
-
-  // =========================
-  // Add New Trip
-  // =========================
-
-  onAddNew() {
-
-     this.ticketDialog = true;
-  }
- 
-
- 
-
-  // =========================
-  // Delete Trip
-  // =========================
-
-  confirmDelete(trip: Trip) {
-
-    Swal.fire({
-      title: 'Delete Trip?',
-      text: 'Are you sure?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Delete'
-    }).then((result) => {
-
-      if (result.isConfirmed) {
-
-        this.trips =
-          this.trips.filter(t => t.id !== trip.id);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Deleted',
-          text: 'Trip deleted successfully',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      }
-    });
-  }
-
-  // =========================
-  // Start Trip
-  // =========================
-
-  startTrip(trip: Trip) {
-
-    Swal.fire({
-      title: 'Start Trip?',
-      text: `Start "${trip.name}" ?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#28a745',
-      confirmButtonText: 'Start'
-    }).then((result) => {
-
-      if (result.isConfirmed) {
-
-        trip.status = 'Started';
-
-        this.trips = [...this.trips];
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Trip Started',
-          text: `${trip.name} started successfully`,
-          timer: 2000,
-          showConfirmButton: false
-        });
-      }
-    });
-  }
-
-  // =========================
-  // End Trip
-  // =========================
-
-  endTrip(trip: Trip) {
-
-    Swal.fire({
-      title: 'End Trip?',
-      text: `End "${trip.name}" ?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'End Trip'
-    }).then((result) => {
-
-      if (result.isConfirmed) {
-
-        trip.status = 'Ended';
-
-        this.trips = [...this.trips];
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Trip Ended',
-          text: `${trip.name} ended successfully`,
-          timer: 2000,
-          showConfirmButton: false
-        });
-      }
-    });
-  }
-
-  // =========================
-  // Open Cancel Dialog
-  // =========================
-
-  openCancelDialog(trip: Trip) {
-
-    this.selectedTrip = trip;
-
-    this.cancelReason = '';
-
-    this.cancelDialog = true;
-  }
-
-  // =========================
-  // Confirm Cancel Trip
-  // =========================
-
-  confirmCancelTrip() {
-
-    if (!this.selectedTrip) {
-      return;
-    }
-
-    this.selectedTrip.status = 'Cancelled';
-
-    this.selectedTrip.cancelReason =
-      this.cancelReason;
-
-    this.trips = [...this.trips];
-
-    this.cancelDialog = false;
-
-    Swal.fire({
-      icon: 'warning',
-      title: 'Trip Cancelled',
-      text: `${this.selectedTrip.name} cancelled successfully`,
-      timer: 2000,
-      showConfirmButton: false
-    });
-  }
-
-  // =========================
-  // Ticket Dialog
-  // =========================
-
-  openTicketDialog(trip: Trip) {
-
-    this.selectedTrip = trip;
-
-    this.ticketDialog = true;
-
+  openTicketModal() {
     this.ticketBarcode = '';
-
-    this.ticketData = null;
+    this.ticketData    = null;
+    this.showTicketModal = true;
   }
 
-  // =========================
-  // Read Ticket
-  // =========================
+  closeTicketModal() {
+    this.showTicketModal = false;
+    this.ticketBarcode   = '';
+    this.ticketData      = null;
+  }
 
   readTicket() {
+    if (!this.ticketBarcode?.trim()) return;
 
+    // Simulate ticket lookup
     this.ticketData = {
-      ticketNumber: this.ticketBarcode,
+      ticketNumber:  this.ticketBarcode,
       passengerName: 'Ahmed Ali',
-      seatNumber: 'A12',
-      status: 'Valid'
+      seatNumber:    'A12',
+      status:        'Valid'
     };
 
     Swal.fire({
       icon: 'success',
       title: 'Ticket Read',
-      text: `Ticket ${this.ticketBarcode} loaded successfully`,
+      text: `Ticket ${this.ticketBarcode} loaded successfully.`,
       timer: 2000,
       showConfirmButton: false
     });
   }
 
-  // =========================
-  // Badge Severity
-  // =========================
+  // ── Cancel modal ──────────────────────────────────────────────
+
+  openCancelModal(trip: Trip) {
+    this.selectedTrip = trip;
+    this.cancelReason = '';
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal() {
+    this.showCancelModal = false;
+    this.cancelReason    = '';
+    this.selectedTrip    = null;
+  }
+
+  confirmCancelTrip() {
+    if (!this.cancelReason?.trim() || !this.selectedTrip) return;
+
+    this.selectedTrip.status       = 'Cancelled';
+    this.selectedTrip.cancelReason = this.cancelReason;
+    this.trips = [...this.trips];
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Trip Cancelled',
+      text: `"${this.selectedTrip.name}" has been cancelled.`,
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    this.closeCancelModal();
+  }
+
+  // ── Reason view modal ─────────────────────────────────────────
+
+  openReasonModal(trip: Trip) {
+    this.selectedTrip   = trip;
+    this.showReasonModal = true;
+  }
+
+  closeReasonModal() {
+    this.showReasonModal = false;
+    this.selectedTrip    = null;
+  }
+
+  // ── Start Trip ────────────────────────────────────────────────
+
+  startTrip(trip: Trip) {
+    Swal.fire({
+      title: 'Start Trip?',
+      text: `Are you sure you want to start "${trip.name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, Start',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        trip.status = 'Started';
+        this.trips  = [...this.trips];
+        Swal.fire({
+          icon: 'success',
+          title: 'Trip Started',
+          text: `"${trip.name}" started successfully.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  // ── End Trip ──────────────────────────────────────────────────
+
+  endTrip(trip: Trip) {
+    Swal.fire({
+      title: 'End Trip?',
+      text: `Are you sure you want to end "${trip.name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, End Trip',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        trip.status = 'Ended';
+        this.trips  = [...this.trips];
+        Swal.fire({
+          icon: 'success',
+          title: 'Trip Ended',
+          text: `"${trip.name}" ended successfully.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  // ── Badge severity ────────────────────────────────────────────
 
   getStatusSeverity(status: string): string {
-
     switch (status) {
-
-      case 'Pending':
-        return 'warning';
-
-      case 'Started':
-        return 'info';
-
-      case 'Ended':
-        return 'success';
-
-      case 'Cancelled':
-        return 'danger';
-
-      default:
-        return 'secondary';
+      case 'Pending':   return 'warning';
+      case 'Started':   return 'info';
+      case 'Ended':     return 'success';
+      case 'Cancelled': return 'danger';
+      default:          return 'secondary';
     }
   }
 
-  // =========================
-  // Sign Out
-  // =========================
+  // ── Overlay click ─────────────────────────────────────────────
+
+  onOverlayClick(event: MouseEvent, modal: 'ticket' | 'cancel' | 'reason') {
+    if (!(event.target as HTMLElement).classList.contains('custom-modal-overlay')) return;
+    if (modal === 'ticket') this.closeTicketModal();
+    if (modal === 'cancel') this.closeCancelModal();
+    if (modal === 'reason') this.closeReasonModal();
+  }
+
+  // ── Navigation ────────────────────────────────────────────────
 
   signOut() {
-
     this.router.navigate(['/module-selection']);
   }
 }

@@ -2,7 +2,7 @@
 <div class="container-fluid">
   <div class="background"></div>
 
-  <!-- Header -->
+  <!-- HEADER -->
   <div class="row mb-2 py-3">
     <div class="col-8">
       <div class="d-flex justify-content-between align-items-center">
@@ -13,9 +13,7 @@
       </div>
     </div>
     <div class="col-4 d-flex justify-content-end">
-      <button class="btn btn-primary" (click)="signOut()">
-        {{ "Home" | translate }}
-      </button>
+      <button class="btn btn-primary" (click)="signOut()">{{ "Home" | translate }}</button>
     </div>
   </div>
 
@@ -28,20 +26,22 @@
     </div>
 
     <div class="trip-data-container">
+
+      <!-- Search LEFT, New Assignment RIGHT -->
       <div class="table-header d-flex align-items-center justify-content-between mb-3">
-        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
-          <i class="pi pi-plus"></i> {{ 'New Assignment' | translate }}
-        </button>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
-            pInputText
-            type="text"
+            pInputText type="text"
             placeholder="Search assignments..."
             [(ngModel)]="globalFilter"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
             class="global-search"
           />
         </span>
+        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
+          <i class="pi pi-plus"></i>&nbsp;{{ 'New Assignment' | translate }}
+        </button>
       </div>
 
       <p-table
@@ -56,124 +56,61 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="tripName">
-              Trip Name <p-sortIcon field="tripName"></p-sortIcon>
-            </th>
-            <th pSortableColumn="tripDuration">
-              Duration <p-sortIcon field="tripDuration"></p-sortIcon>
-            </th>
-            <th>Passenger Count</th>
-            <th pSortableColumn="driver.driverName">
-              Driver <p-sortIcon field="driver.driverName"></p-sortIcon>
-            </th>
-            <th pSortableColumn="vehicle.vehicleName">
-              Vehicle <p-sortIcon field="vehicle.vehicleName"></p-sortIcon>
-            </th>
-            <th pSortableColumn="tripStatus">
-              Status <p-sortIcon field="tripStatus"></p-sortIcon>
-            </th>
+            <th pSortableColumn="tripName">Trip Name <p-sortIcon field="tripName"></p-sortIcon></th>
+            <th pSortableColumn="tripDuration">Duration <p-sortIcon field="tripDuration"></p-sortIcon></th>
+            <th>Passengers</th>
+            <th pSortableColumn="driver.driverName">Driver <p-sortIcon field="driver.driverName"></p-sortIcon></th>
+            <th pSortableColumn="vehicle.vehicleName">Vehicle <p-sortIcon field="vehicle.vehicleName"></p-sortIcon></th>
+            <th pSortableColumn="tripStatus">Status <p-sortIcon field="tripStatus"></p-sortIcon></th>
             <th>Actions</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-assignment>
           <tr>
-
-            <!-- Trip Name → trip modal -->
             <td>
-              <a
-                href="javascript:void(0)"
-                class="text-primary fw-semibold"
-                (click)="openTripModal(assignment)"
-              
-              >
+              <a href="javascript:void(0)" class="text-primary fw-semibold" (click)="openTripModal(assignment)">
                 {{ assignment.tripName }}
               </a>
             </td>
-
             <td>{{ assignment.tripDuration }}</td>
-
-            <!-- Passenger Count → passenger modal -->
             <td>
-              <a
-                href="javascript:void(0)"
-                class="text-primary fw-semibold"
-                (click)="openPassengerModal(assignment.passengers)"
-             
-              >
+              <a href="javascript:void(0)" class="text-primary fw-semibold" (click)="openPassengerModal(assignment.passengers)">
                 {{ assignment.passengerCount }}
-                <i class="pi pi-users ms-1" style="font-size: 0.8rem;"></i>
+                <i class="pi pi-users ml-1" style="font-size:0.8rem;"></i>
               </a>
             </td>
-
-            <!-- Driver → driver modal -->
             <td>
-              <a
-                href="javascript:void(0)"
-                class="text-primary fw-semibold"
-                (click)="openDriverModal(assignment.driver)"
-             
-              >
+              <a href="javascript:void(0)" class="text-primary fw-semibold" (click)="openDriverModal(assignment.driver)">
                 {{ assignment.driver.driverName }}
-                <i class="pi pi-user ms-1" style="font-size: 0.8rem;"></i>
+                <i class="pi pi-user ml-1" style="font-size:0.8rem;"></i>
               </a>
             </td>
-
-            <!-- Vehicle → vehicle modal -->
             <td>
-              <a
-                href="javascript:void(0)"
-                class="text-primary fw-semibold"
-                (click)="openVehicleModal(assignment.vehicle)"
-                
-              >
+              <a href="javascript:void(0)" class="text-primary fw-semibold" (click)="openVehicleModal(assignment.vehicle)">
                 {{ assignment.vehicle.vehicleName }}
-                <i class="pi pi-car ms-1" style="font-size: 0.8rem;"></i>
+                <i class="pi pi-car ml-1" style="font-size:0.8rem;"></i>
               </a>
             </td>
-
-            <!-- Status — last before actions -->
             <td>
-              <p-badge
-                [value]="assignment.tripStatus"
-                [severity]="getStatusSeverity(assignment.tripStatus)"
-              ></p-badge>
+              <p-badge [value]="assignment.tripStatus" [severity]="getStatusSeverity(assignment.tripStatus)"></p-badge>
             </td>
-
-            <!-- Actions -->
             <td>
-              <button
-                pButton
-                type="button"
-                icon="pi pi-user-edit"
+              <button pButton type="button" icon="pi pi-user-edit"
                 class="p-button-rounded p-button-text p-button-info mr-1"
-                title="Change Driver"
-                (click)="confirmChangeDriver(assignment)"
-              ></button>
-              <button
-                pButton
-                type="button"
-                icon="pi pi-car"
+                title="Change Driver" (click)="confirmChangeDriver(assignment)"></button>
+              <button pButton type="button" icon="pi pi-car"
                 class="p-button-rounded p-button-text p-button-warning mr-1"
-                title="Change Vehicle"
-                (click)="confirmChangeVehicle(assignment)"
-              ></button>
-              <button
-                pButton
-                type="button"
-                icon="pi pi-refresh"
+                title="Change Vehicle" (click)="confirmChangeVehicle(assignment)"></button>
+              <button pButton type="button" icon="pi pi-refresh"
                 class="p-button-rounded p-button-text p-button-success"
-                title="Change Status"
-                (click)="confirmChangeStatus(assignment)"
-              ></button>
+                title="Change Status" (click)="confirmChangeStatus(assignment)"></button>
             </td>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="7" class="text-center">No assignments found.</td>
-          </tr>
+          <tr><td colspan="7" class="text-center">No assignments found.</td></tr>
         </ng-template>
       </p-table>
 
@@ -182,183 +119,241 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--  TRIP DETAIL MODAL                                         -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="tripModal" tabindex="-1" aria-labelledby="tripModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="tripModalLabel">
-          <i class="pi pi-map-marker me-2 text-primary"></i> Trip Details
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- ============================================================
+     NEW ASSIGNMENT MODAL
+============================================================ -->
+<div *ngIf="showNewModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'new')">
+  <div class="custom-modal-box assignment-modal-box">
+
+    <div class="custom-modal-header">
+      <h5 class="mb-0"><i class="pi pi-plus-circle mr-2 text-success"></i>New Assignment</h5>
+      <button type="button" class="custom-modal-close" (click)="closeNewModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="custom-modal-body">
+
+      <!-- Step 1 — Pick Trip, Driver, Vehicle -->
+      <div class="row">
+        <div class="col-12 mb-3">
+          <label class="field-label">Trip <span class="text-danger">*</span></label>
+          <select class="form-control" [(ngModel)]="newForm.tripId" (change)="onTripChange()">
+            <option value="">— Select a trip —</option>
+            <option *ngFor="let t of availableTrips" [value]="t.id">
+              {{ t.tripName }} &nbsp;({{ t.startTime }} → {{ t.endTime }}, every {{ t.segmentDurationHours }}h)
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="field-label">Driver <span class="text-danger">*</span></label>
+          <select class="form-control" [(ngModel)]="newForm.driverId">
+            <option value="">— Select a driver —</option>
+            <option *ngFor="let d of availableDrivers" [value]="d.id">
+              {{ d.driverName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="field-label">Vehicle <span class="text-danger">*</span></label>
+          <select class="form-control" [(ngModel)]="newForm.vehicleId">
+            <option value="">— Select a vehicle —</option>
+            <option *ngFor="let v of availableVehicles" [value]="v.id">
+              {{ v.vehicleName }} ({{ v.plateNumber }})
+            </option>
+          </select>
+        </div>
       </div>
-      <div class="modal-body" *ngIf="selectedTrip">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item px-0">
-            <strong>Trip Name: </strong>{{ selectedTrip.tripName }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Duration: </strong>{{ selectedTrip.tripDuration }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Passenger Count: </strong>{{ selectedTrip.passengerCount }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Driver: </strong>{{ selectedTrip.driver.driverName }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Vehicle: </strong>{{ selectedTrip.vehicle.vehicleName }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Status: </strong>{{ selectedTrip.tripStatus }}
-          </li>
-        </ul>
+
+      <!-- Step 2 — Generated segments preview -->
+      <div *ngIf="generatedSegments.length > 0">
+        <div class="segments-header">
+          <i class="pi pi-calendar mr-2"></i>
+          Generated Trip Slots
+          <span class="segments-count">{{ generatedSegments.length }} slot{{ generatedSegments.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="segments-table-wrap">
+          <table class="segments-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Trip Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let seg of generatedSegments; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ seg.name }}</td>
+                <td><span class="time-chip time-chip--start">{{ seg.startTime }}</span></td>
+                <td><span class="time-chip time-chip--end">{{ seg.endTime }}</span></td>
+                <td>{{ seg.duration }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="segments-note">
+          <i class="pi pi-info-circle mr-1"></i>
+          Each slot will be created as a separate assignment with the selected driver and vehicle.
+        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+      <!-- Empty state before trip selected -->
+      <div *ngIf="generatedSegments.length === 0 && newForm.tripId === ''" class="segments-empty">
+        <i class="pi pi-calendar-times"></i>
+        <p>Select a trip above to preview generated slots.</p>
       </div>
+
+    </div>
+
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="closeNewModal()">
+        <i class="pi pi-times mr-1"></i> Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        [disabled]="!newForm.tripId || !newForm.driverId || !newForm.vehicleId || generatedSegments.length === 0"
+        (click)="saveNewAssignment()"
+      >
+        <i class="pi pi-check mr-1"></i>
+        Create {{ generatedSegments.length }} Assignment{{ generatedSegments.length !== 1 ? 's' : '' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     TRIP DETAIL MODAL
+============================================================ -->
+<div *ngIf="showTripModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'trip')">
+  <div class="custom-modal-box" style="width:480px;">
+    <div class="custom-modal-header">
+      <h5 class="mb-0"><i class="pi pi-map-marker mr-2 text-primary"></i>Trip Details</h5>
+      <button type="button" class="custom-modal-close" (click)="showTripModal=false"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="custom-modal-body" *ngIf="selectedTrip">
+      <div class="detail-row"><span class="detail-label">Trip Name</span><span class="detail-value">{{ selectedTrip.tripName }}</span></div>
+      <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-value">{{ selectedTrip.tripDuration }}</span></div>
+      <div class="detail-row"><span class="detail-label">Passengers</span><span class="detail-value">{{ selectedTrip.passengerCount }}</span></div>
+      <div class="detail-row"><span class="detail-label">Driver</span><span class="detail-value">{{ selectedTrip.driver.driverName }}</span></div>
+      <div class="detail-row"><span class="detail-label">Vehicle</span><span class="detail-value">{{ selectedTrip.vehicle.vehicleName }}</span></div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value">
+          <p-badge [value]="selectedTrip.tripStatus" [severity]="getStatusSeverity(selectedTrip.tripStatus)"></p-badge>
+        </span>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showTripModal=false"><i class="pi pi-times mr-1"></i>Close</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--  DRIVER DETAIL MODAL                                       -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="driverModal" tabindex="-1" aria-labelledby="driverModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="driverModalLabel">
-          <i class="pi pi-user me-2 text-primary"></i> Driver Details
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- ============================================================
+     DRIVER DETAIL MODAL
+============================================================ -->
+<div *ngIf="showDriverModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'driver')">
+  <div class="custom-modal-box" style="width:480px;">
+    <div class="custom-modal-header">
+      <h5 class="mb-0"><i class="pi pi-user mr-2 text-primary"></i>Driver Details</h5>
+      <button type="button" class="custom-modal-close" (click)="showDriverModal=false"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="custom-modal-body" *ngIf="selectedDriver">
+      <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">{{ selectedDriver.driverName }}</span></div>
+      <div class="detail-row"><span class="detail-label">License ID</span><span class="detail-value">{{ selectedDriver.licenseId }}</span></div>
+      <div class="detail-row"><span class="detail-label">ID Number</span><span class="detail-value">{{ selectedDriver.idNumber }}</span></div>
+      <div class="detail-row" [class.text-danger]="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)">
+        <span class="detail-label">License Expiry</span>
+        <span class="detail-value">
+          {{ selectedDriver.licenseExpiredDate }}
+          <i *ngIf="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)" class="pi pi-exclamation-triangle ml-1"></i>
+        </span>
       </div>
-      <div class="modal-body" *ngIf="selectedDriver">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item px-0">
-            <strong>Driver Name: </strong>{{ selectedDriver.driverName }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>License ID: </strong>{{ selectedDriver.licenseId }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>ID Number: </strong>{{ selectedDriver.idNumber }}
-          </li>
-          <li class="list-group-item px-0"
-              [class.text-danger]="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)">
-            <strong>License Expiry: </strong>{{ selectedDriver.licenseExpiredDate }}
-            <i *ngIf="isLicenseExpiredLocal(selectedDriver.licenseExpiredDate)"
-               class="pi pi-exclamation-triangle ms-1"></i>
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Address: </strong>{{ selectedDriver.address }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Hiring Date: </strong>{{ selectedDriver.hiringDate }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Chronic Disease: </strong>
-            <span class="badge ms-1"
-              [class.bg-warning]="selectedDriver.hasChronicDisease"
-              [class.bg-success]="!selectedDriver.hasChronicDisease">
-              {{ selectedDriver.hasChronicDisease ? 'Yes' : 'No' }}
-            </span>
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Blocked: </strong>
-            <span class="badge ms-1"
-              [class.bg-danger]="selectedDriver.isBlocked"
-              [class.bg-success]="!selectedDriver.isBlocked">
-              {{ selectedDriver.isBlocked ? 'Yes' : 'No' }}
-            </span>
-          </li>
-        </ul>
+      <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">{{ selectedDriver.address }}</span></div>
+      <div class="detail-row"><span class="detail-label">Hiring Date</span><span class="detail-value">{{ selectedDriver.hiringDate }}</span></div>
+      <div class="detail-row">
+        <span class="detail-label">Chronic Disease</span>
+        <span class="detail-value">
+          <p-badge [value]="selectedDriver.hasChronicDisease ? 'Yes' : 'No'" [severity]="selectedDriver.hasChronicDisease ? 'danger' : 'success'"></p-badge>
+        </span>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <div class="detail-row">
+        <span class="detail-label">Blocked</span>
+        <span class="detail-value">
+          <p-badge [value]="selectedDriver.isBlocked ? 'Yes' : 'No'" [severity]="selectedDriver.isBlocked ? 'danger' : 'success'"></p-badge>
+        </span>
       </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showDriverModal=false"><i class="pi pi-times mr-1"></i>Close</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--  VEHICLE DETAIL MODAL                                      -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="vehicleModalLabel">
-          <i class="pi pi-car me-2 text-primary"></i> Vehicle Details
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- ============================================================
+     VEHICLE DETAIL MODAL
+============================================================ -->
+<div *ngIf="showVehicleModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'vehicle')">
+  <div class="custom-modal-box" style="width:480px;">
+    <div class="custom-modal-header">
+      <h5 class="mb-0"><i class="pi pi-car mr-2 text-primary"></i>Vehicle Details</h5>
+      <button type="button" class="custom-modal-close" (click)="showVehicleModal=false"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="custom-modal-body" *ngIf="selectedVehicle">
+      <div class="detail-row"><span class="detail-label">Vehicle Name</span><span class="detail-value">{{ selectedVehicle.vehicleName }}</span></div>
+      <div class="detail-row"><span class="detail-label">Plate Number</span><span class="detail-value">{{ selectedVehicle.plateNumber }}</span></div>
+      <div class="detail-row"><span class="detail-label">Model</span><span class="detail-value">{{ selectedVehicle.model }}</span></div>
+      <div class="detail-row"><span class="detail-label">Year</span><span class="detail-value">{{ selectedVehicle.year }}</span></div>
+      <div class="detail-row"><span class="detail-label">Capacity</span><span class="detail-value">{{ selectedVehicle.capacity }} seats</span></div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value">
+          <p-badge [value]="selectedVehicle.status" [severity]="selectedVehicle.status === 'Active' ? 'success' : 'danger'"></p-badge>
+        </span>
       </div>
-      <div class="modal-body" *ngIf="selectedVehicle">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item px-0">
-            <strong>Vehicle Name: </strong>{{ selectedVehicle.vehicleName }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Plate Number: </strong>{{ selectedVehicle.plateNumber }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Model: </strong>{{ selectedVehicle.model }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Year: </strong>{{ selectedVehicle.year }}
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Capacity: </strong>{{ selectedVehicle.capacity }} seats
-          </li>
-          <li class="list-group-item px-0">
-            <strong>Status: </strong>
-            <span class="badge ms-1"
-              [class.bg-success]="selectedVehicle.status === 'Active'"
-              [class.bg-danger]="selectedVehicle.status !== 'Active'">
-              {{ selectedVehicle.status }}
-            </span>
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showVehicleModal=false"><i class="pi pi-times mr-1"></i>Close</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--  PASSENGER LIST MODAL                                      -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="passengerModalLabel">
-          <i class="pi pi-users me-2 text-primary"></i> Passenger List
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ul class="list-group list-group-flush" *ngIf="selectedPassengers.length > 0; else noPassengers">
-          <li
-            class="list-group-item px-0"
-            *ngFor="let passenger of selectedPassengers; let i = index"
-          >
-            <strong>#{{ i + 1 }} &nbsp;|&nbsp; Name: </strong>{{ passenger.name }}
-            &nbsp;&nbsp;<strong>Phone: </strong>{{ passenger.phone }}
-            &nbsp;&nbsp;<strong>Seat: </strong>{{ passenger.seat }}
-          </li>
-        </ul>
-        <ng-template #noPassengers>
-          <p class="text-center text-muted mb-0">No passengers found.</p>
-        </ng-template>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<!-- ============================================================
+     PASSENGER LIST MODAL
+============================================================ -->
+<div *ngIf="showPassengerModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'passenger')">
+  <div class="custom-modal-box" style="width:620px;">
+    <div class="custom-modal-header">
+      <h5 class="mb-0"><i class="pi pi-users mr-2 text-primary"></i>Passenger List</h5>
+      <button type="button" class="custom-modal-close" (click)="showPassengerModal=false"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="custom-modal-body">
+      <div *ngIf="selectedPassengers.length === 0" class="text-center text-muted py-4">No passengers found.</div>
+      <table *ngIf="selectedPassengers.length > 0" class="segments-table">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Phone</th><th>Seat</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of selectedPassengers; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.phone }}</td>
+            <td>{{ p.seat }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showPassengerModal=false"><i class="pi pi-times mr-1"></i>Close</button>
     </div>
   </div>
-</div>  
+</div>

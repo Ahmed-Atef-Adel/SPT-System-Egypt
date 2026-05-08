@@ -1,1 +1,296 @@
-<p>passanger-data works!</p>
+<app-loader></app-loader>
+<div class="container-fluid">
+  <div class="background"></div>
+
+  <!-- HEADER -->
+  <div class="row mb-2 py-3">
+    <div class="col-8">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-justified">
+          <h3 class="text-dark font-weight-semibold mb-0 mt-1">
+            {{ "Hi_Welcome" | translate }}
+            <span class="text-primary">{{ this.auth.getUserName() }}</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 d-flex justify-content-end">
+      <button class="btn btn-primary" (click)="signOut()">
+        {{ "Home" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- TITLE CARD -->
+  <div class="col-lg-12 col-xl-12">
+    <div class="card custom-card" style="opacity: 0.7">
+      <div class="card-header">
+        <div class="card-title">{{ "Passengers" | translate }}</div>
+        <p>{{ "Passengers_Description" | translate }}</p>
+      </div>
+    </div>
+
+    <!-- TABLE CONTAINER -->
+    <div class="trip-data-container">
+
+      <!-- Search LEFT, Add New RIGHT -->
+      <div class="table-header d-flex align-items-center justify-content-between mb-3">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search passengers..."
+            [(ngModel)]="globalFilter"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            class="global-search"
+          />
+        </span>
+        <button pButton type="button" class="p-button-success" (click)="onAddNew()">
+          <i class="pi pi-plus"></i>&nbsp;{{ 'Add New' | translate }}
+        </button>
+      </div>
+
+      <p-table
+        #dt
+        [value]="passengers"
+        [paginator]="true"
+        [rows]="10"
+        [sortMode]="'multiple'"
+        [globalFilterFields]="['name','email','telephone','lastLoginDate','lastTripDate','lastTripName','isBlocked']"
+        class="p-datatable-striped"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+            <th pSortableColumn="telephone">Telephone <p-sortIcon field="telephone"></p-sortIcon></th>
+            <th pSortableColumn="lastLoginDate">Last Login <p-sortIcon field="lastLoginDate"></p-sortIcon></th>
+            <th pSortableColumn="lastTripDate">Last Trip Date <p-sortIcon field="lastTripDate"></p-sortIcon></th>
+            <th pSortableColumn="lastTripName">Last Trip <p-sortIcon field="lastTripName"></p-sortIcon></th>
+            <th pSortableColumn="isBlocked">Status <p-sortIcon field="isBlocked"></p-sortIcon></th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-passenger>
+          <tr>
+            <td>{{ passenger.name }}</td>
+            <td>{{ passenger.email }}</td>
+            <td>{{ passenger.telephone }}</td>
+            <td>{{ passenger.lastLoginDate }}</td>
+            <td>{{ passenger.lastTripDate }}</td>
+            <td>{{ passenger.lastTripName }}</td>
+            <td>
+              <p-badge
+                [value]="passenger.isBlocked ? 'Blocked' : 'Active'"
+                [severity]="passenger.isBlocked ? 'danger' : 'success'"
+              ></p-badge>
+            </td>
+            <td>
+              <!-- View Trips -->
+              <button
+                pButton type="button"
+                icon="pi pi-list"
+                class="p-button-rounded p-button-text p-button-info mr-1"
+                title="View Trips"
+                (click)="openTripsModal(passenger)"
+              ></button>
+              <!-- Block / Unblock -->
+              <button
+                pButton type="button"
+                [icon]="passenger.isBlocked ? 'pi pi-lock-open' : 'pi pi-lock'"
+                [class]="passenger.isBlocked
+                  ? 'p-button-rounded p-button-text p-button-success'
+                  : 'p-button-rounded p-button-text p-button-warning'"
+                [title]="passenger.isBlocked ? 'Unblock Passenger' : 'Block Passenger'"
+                (click)="openBlockModal(passenger)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center">No passengers found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-toast></p-toast>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Add / Edit Passenger Modal
+============================================================ -->
+<div *ngIf="showDialog" class="custom-modal-overlay" (click)="onOverlayClick($event, 'dialog')">
+  <div class="custom-modal-box">
+
+    <div class="custom-modal-header">
+      <h5 class="mb-0">{{ isEditMode ? 'Edit Passenger' : 'Add New Passenger' }}</h5>
+      <button type="button" class="custom-modal-close" (click)="closeDialog()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="custom-modal-body">
+      <div class="p-field mb-3">
+        <label for="pName">Passenger Name</label>
+        <input id="pName" type="text" class="form-control" [(ngModel)]="passengerForm.name" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="pEmail">Email</label>
+        <input id="pEmail" type="email" class="form-control" [(ngModel)]="passengerForm.email" />
+      </div>
+      <div class="p-field mb-3">
+        <label for="pTelephone">Telephone</label>
+        <input id="pTelephone" type="text" class="form-control" [(ngModel)]="passengerForm.telephone" />
+      </div>
+    </div>
+
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="closeDialog()">
+        <i class="pi pi-times mr-1"></i> Cancel
+      </button>
+      <button type="button" class="btn btn-success" (click)="savePassenger()">
+        <i class="pi pi-check mr-1"></i>
+        {{ isEditMode ? 'Save Changes' : 'Add Passenger' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     Block / Unblock Passenger Modal
+============================================================ -->
+<div *ngIf="showBlockModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'block')">
+  <div class="custom-modal-box" style="width: 460px;">
+
+    <div class="custom-modal-header">
+      <h5 class="mb-0">
+        <i [class]="blockTarget?.isBlocked ? 'pi pi-lock-open mr-2 text-success' : 'pi pi-lock mr-2 text-warning'"></i>
+        {{ blockTarget?.isBlocked ? 'Unblock Passenger' : 'Block Passenger' }}
+      </h5>
+      <button type="button" class="custom-modal-close" (click)="closeBlockModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="custom-modal-body">
+      <p class="mb-3 text-muted">
+        Passenger: <strong>{{ blockTarget?.name }}</strong>
+      </p>
+      <div class="p-field mb-2">
+        <label for="blockReason">
+          {{ blockTarget?.isBlocked ? 'Reason for Unblocking' : 'Reason for Blocking' }}
+          <span class="text-danger">*</span>
+        </label>
+        <textarea
+          id="blockReason"
+          class="form-control"
+          rows="3"
+          placeholder="Enter reason..."
+          [(ngModel)]="blockReason"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="closeBlockModal()">
+        <i class="pi pi-times mr-1"></i> Cancel
+      </button>
+      <button
+        type="button"
+        [class]="blockTarget?.isBlocked ? 'btn btn-success' : 'btn btn-danger'"
+        (click)="confirmBlockToggle()"
+      >
+        <i [class]="blockTarget?.isBlocked ? 'pi pi-lock-open mr-1' : 'pi pi-lock mr-1'"></i>
+        {{ blockTarget?.isBlocked ? 'Unblock' : 'Block' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     Passenger Trips Modal
+============================================================ -->
+<div *ngIf="showTripsModal" class="custom-modal-overlay" (click)="onOverlayClick($event, 'trips')">
+  <div class="custom-modal-box trips-modal-box">
+
+    <div class="custom-modal-header">
+      <h5 class="mb-0">
+        <i class="pi pi-list mr-2"></i>
+        Trips — {{ tripsTarget?.name }}
+      </h5>
+      <button type="button" class="custom-modal-close" (click)="closeTripsModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="custom-modal-body">
+      <!-- Empty state -->
+      <div *ngIf="pagedTrips.length === 0" class="text-center text-muted py-4">
+        <i class="pi pi-inbox" style="font-size:2rem;"></i>
+        <p class="mt-2">No trips found for this passenger.</p>
+      </div>
+
+      <!-- Trips table -->
+      <table *ngIf="pagedTrips.length > 0" class="trips-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th (click)="sortTrips('tripName')" class="sortable">
+              Trip Name
+              <i class="pi" [ngClass]="getTripSortIcon('tripName')"></i>
+            </th>
+            <th (click)="sortTrips('price')" class="sortable">
+              Price
+              <i class="pi" [ngClass]="getTripSortIcon('price')"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let trip of pagedTrips; let i = index">
+            <td>{{ (tripsPage - 1) * tripsPageSize + i + 1 }}</td>
+            <td>{{ trip.tripName }}</td>
+            <td>{{ trip.price | currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div *ngIf="tripsTotalPages > 1" class="trips-pagination">
+        <button
+          class="page-btn"
+          [disabled]="tripsPage === 1"
+          (click)="setTripsPage(tripsPage - 1)"
+        ><i class="pi pi-chevron-left"></i></button>
+
+        <button
+          *ngFor="let p of tripsPageNumbers"
+          class="page-btn"
+          [class.active]="p === tripsPage"
+          (click)="setTripsPage(p)"
+        >{{ p }}</button>
+
+        <button
+          class="page-btn"
+          [disabled]="tripsPage === tripsTotalPages"
+          (click)="setTripsPage(tripsPage + 1)"
+        ><i class="pi pi-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeTripsModal()">
+        <i class="pi pi-times mr-1"></i> Close
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -7,6 +7,10 @@ import { DriverDataComponent } from './driver-data/driver-data.component';
 import { VehiclesDataComponent } from './vehicles-data/vehicles-data.component';
 import { TripAssignmentComponent } from './trip-assignment/trip-assignment.component';
 import { DriverAppComponent } from './driver-app/driver-app.component';
+import { PassangerDataComponent } from './passanger-data/passanger-data.component';
+import { ReportComponent } from './report/report.component';
+ 
+ 
  
  
 
@@ -49,6 +53,18 @@ const routes: Routes = [
    {
     path: 'driver-app',
     component: DriverAppComponent,
+    //canActivate: [AdminGuard],
+    children: errorRoute
+  },
+    {
+    path: 'passengers',
+    component: PassangerDataComponent,
+    //canActivate: [AdminGuard],
+    children: errorRoute
+  },
+   {
+    path: 'reports',
+    component: ReportComponent,
     //canActivate: [AdminGuard],
     children: errorRoute
   },

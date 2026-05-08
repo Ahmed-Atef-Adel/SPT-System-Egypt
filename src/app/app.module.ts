@@ -63,6 +63,8 @@ import { VehiclesDataComponent } from './vehicles-data/vehicles-data.component';
 import { AppRoutingModule } from './app-routing.module';
 import { TripAssignmentComponent } from './trip-assignment/trip-assignment.component';
 import { DriverAppComponent } from './driver-app/driver-app.component';
+import { PassangerDataComponent } from './passanger-data/passanger-data.component';
+import { ReportComponent } from './report/report.component';
  
 
 
@@ -85,7 +87,9 @@ export function initializeApp(appInitService: ConfigService) {
     TripDataComponent,
     VehiclesDataComponent,
     TripAssignmentComponent,
-    DriverAppComponent
+    DriverAppComponent,
+    PassangerDataComponent,
+    ReportComponent
   ],
   imports: [
     TranslateModule.forRoot({

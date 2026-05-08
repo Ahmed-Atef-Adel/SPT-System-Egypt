@@ -13,126 +13,196 @@
         </div>
       </div>
     </div>
-       <div class="col-4 d-flex justify-content-end">
+    <div class="col-4 d-flex justify-content-end">
       <button class="btn btn-primary" (click)="signOut()">
         {{ "client.Sign_Out" | translate }}
       </button>
-    </div>  
+    </div>
   </div>
 
   <div class="col-lg-12 col-xl-12">
-    <div class="card custom-card" style="opacity: 0.7">
-      <div class="card-header">
-        <div class="card-title">
-          {{ "client.Module_Selection" | translate }}
-        </div>
-        <p>{{ "client.Module_Description" | translate }}</p>
-      </div>
-    </div>
+     
     <div class="row mb-5">
+
+      <!-- Trips -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
         <a routerLink="/trips">
           <div class="card p-3">
             <div class="card-body" style="align-self: center">
               <div class="mb-3 text-center about-team">
-                <img class="rounded-pill" src="./assets/icons/margin.png" alt="image" />
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#E6F1FB;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Map pin / route icon -->
+                    <circle cx="8" cy="7" r="2.5" fill="#185FA5"/>
+                    <path d="M8 4C5.79 4 4 5.79 4 8c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" fill="#378ADD"/>
+                    <circle cx="8" cy="7" r="1.2" fill="#E6F1FB"/>
+                    <circle cx="16" cy="14" r="2" fill="#185FA5"/>
+                    <path d="M16 11.5c-1.93 0-3.5 1.57-3.5 3.5 0 2.5 3.5 6 3.5 6s3.5-3.5 3.5-6c0-1.93-1.57-3.5-3.5-3.5z" fill="#378ADD"/>
+                    <circle cx="16" cy="14" r="1" fill="#E6F1FB"/>
+                    <path d="M8.5 9.5 Q12 12 15.5 13" stroke="#185FA5" stroke-width="1.2" stroke-dasharray="2 1.5" fill="none" stroke-linecap="round"/>
+                  </svg>
+                </div>
               </div>
               <div class="tx-16 text-center font-weight-semibold">
                 {{ "Trips" | translate }}
               </div>
-              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
             </div>
           </div>
         </a>
       </div>
+
+      <!-- Operations -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
         <a routerLink="/assignments">
-        <div class="card p-3">
-          <div class="card-body" style="align-self: center">
-            <div class="mb-3 text-center about-team">
-              <img class="rounded-pill" src="./assets/icons/operation.png" alt="image" />
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#EAF3DE;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Operations: gear/settings icon -->
+                    <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="#639922"/>
+                    <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65z" fill="#97C459"/>
+                    <circle cx="12" cy="12" r="3" fill="#3B6D11"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Operations" | translate }}
+              </div>
             </div>
-            <div class="tx-16 text-center font-weight-semibold">
-              {{ "Operations" | translate }}
-            </div>
-            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
           </div>
-        </div>
         </a>
       </div>
+
+      <!-- Passengers -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
-        <div class="card p-3">
-          <!-- <label class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="example-checkbox2"
-              value="option2">
-          <span class="custom-control-label"></span>
-      </label> -->
-          <div class="card-body" style="align-self: center">
-            <div class="mb-3 text-center about-team">
-              <img class="rounded-pill" src="./assets/icons/clients.png" alt="image" />
+        <a routerLink="/passengers">
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#EEEDFE;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Passengers: group of people -->
+                    <circle cx="12" cy="7" r="3" fill="#7F77DD"/>
+                    <path d="M5 19c0-3.87 3.13-7 7-7s7 3.13 7 7H5z" fill="#534AB7"/>
+                    <!-- Left person (smaller/behind) -->
+                    <circle cx="5.5" cy="8.5" r="2" fill="#AFA9EC"/>
+                    <path d="M1.5 19c0-2.76 1.57-4.9 3.5-5.6A6.5 6.5 0 0 0 2 19H1.5z" fill="#AFA9EC"/>
+                    <!-- Right person (smaller/behind) -->
+                    <circle cx="18.5" cy="8.5" r="2" fill="#AFA9EC"/>
+                    <path d="M22.5 19c0-2.76-1.57-4.9-3.5-5.6A6.5 6.5 0 0 1 22 19h.5z" fill="#AFA9EC"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Passangers" | translate }}
+              </div>
             </div>
-            <div class="tx-16 text-center font-weight-semibold">
-              {{ "Passangers" | translate }}
-            </div>
-            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
           </div>
-        </div>
+        </a>
       </div>
+
+      <!-- Drivers -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
         <a routerLink="/drivers">
           <div class="card p-3">
             <div class="card-body" style="align-self: center">
               <div class="mb-3 text-center about-team">
-                <img class="rounded-pill" src="./assets/icons/margin.png" alt="image" />
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#FAEEDA;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Driver: steering wheel -->
+                    <circle cx="12" cy="12" r="8.5" stroke="#BA7517" stroke-width="1.5" fill="none"/>
+                    <circle cx="12" cy="12" r="5.5" stroke="#EF9F27" stroke-width="1.2" fill="none"/>
+                    <circle cx="12" cy="12" r="2" fill="#BA7517"/>
+                    <!-- Spokes -->
+                    <line x1="12" y1="3.5" x2="12" y2="6.5" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="5.2" y1="15.5" x2="7.8" y2="14" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="18.8" y1="15.5" x2="16.2" y2="14" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Grip bumps -->
+                    <circle cx="12" cy="3.5" r="1" fill="#854F0B"/>
+                    <circle cx="4.7" cy="16" r="1" fill="#854F0B"/>
+                    <circle cx="19.3" cy="16" r="1" fill="#854F0B"/>
+                  </svg>
+                </div>
               </div>
               <div class="tx-16 text-center font-weight-semibold">
                 {{ "Drivers" | translate }}
               </div>
-              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
             </div>
           </div>
         </a>
       </div>
+
+      <!-- Reporting -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
-        <div class="card p-3">
-          <div class="card-body" style="align-self: center">
-            <div class="mb-3 text-center about-team">
-              <img class="rounded-pill" src="./assets/icons/report.png" alt="image" />
+        <a routerLink="/reports">
+          <div class="card p-3">
+            <div class="card-body" style="align-self: center">
+              <div class="mb-3 text-center about-team">
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#E1F5EE;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Reporting: bar chart with trend line -->
+                    <rect x="3" y="14" width="3.5" height="6" rx="0.75" fill="#1D9E75"/>
+                    <rect x="8" y="10" width="3.5" height="10" rx="0.75" fill="#1D9E75"/>
+                    <rect x="13" y="7" width="3.5" height="13" rx="0.75" fill="#1D9E75"/>
+                    <rect x="18" y="4" width="3.5" height="16" rx="0.75" fill="#0F6E56"/>
+                    <!-- Trend line -->
+                    <polyline points="4.75,13 9.75,9 14.75,6 19.75,3.5"
+                              stroke="#9FE1CB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <circle cx="4.75" cy="13" r="1.2" fill="#5DCAA5"/>
+                    <circle cx="9.75" cy="9" r="1.2" fill="#5DCAA5"/>
+                    <circle cx="14.75" cy="6" r="1.2" fill="#5DCAA5"/>
+                    <circle cx="19.75" cy="3.5" r="1.2" fill="#5DCAA5"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="tx-16 text-center font-weight-semibold">
+                {{ "Reporting" | translate }}
+              </div>
             </div>
-            <div class="tx-16 text-center font-weight-semibold">
-              {{ "Reporting" | translate }}
-            </div>
-            <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
           </div>
-        </div>
+        </a>
       </div>
+
+      <!-- Vehicles -->
       <div class="col-xl-2 col-lg-6 col-md-6 col-sm-12">
         <a routerLink="/vehicles">
           <div class="card p-3">
             <div class="card-body" style="align-self: center">
               <div class="mb-3 text-center about-team">
-                <img class="rounded-pill" src="./assets/icons/administration.png" alt="image" />
+                <div class="rounded-pill d-inline-flex align-items-center justify-content-center"
+                     style="width:64px; height:64px; background:#FAECE7;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Vehicles: side-view car -->
+                    <rect x="2" y="13" width="20" height="5" rx="2" fill="#D85A30"/>
+                    <path d="M5 13 L7 9 Q8 8 10 8 L15 8 Q17 8 18 9 L20 13 Z" fill="#F0997B"/>
+                    <!-- Windows -->
+                    <path d="M9 9.5 L8 12.5 L11.5 12.5 L11.5 9.5 Z" fill="#993C1D" opacity="0.5"/>
+                    <path d="M12.5 9.5 L12.5 12.5 L16 12.5 L17 9.5 Z" fill="#993C1D" opacity="0.5"/>
+                    <!-- Wheels -->
+                    <circle cx="6.5" cy="18.5" r="2.5" fill="#712B13"/>
+                    <circle cx="6.5" cy="18.5" r="1.2" fill="#FAECE7"/>
+                    <circle cx="17.5" cy="18.5" r="2.5" fill="#712B13"/>
+                    <circle cx="17.5" cy="18.5" r="1.2" fill="#FAECE7"/>
+                    <!-- Headlight & taillight -->
+                    <rect x="2" y="14.5" width="1.5" height="2" rx="0.4" fill="#FAC775"/>
+                    <rect x="20.5" y="14.5" width="1.5" height="2" rx="0.4" fill="#993C1D"/>
+                  </svg>
+                </div>
               </div>
               <div class="tx-16 text-center font-weight-semibold">
                 {{ "Vehicles" | translate }}
               </div>
-              <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio21" checked>
-            <label class="btn btn-outline-primary" for="btnradio21">Radio 1</label>
-          </div> -->
-              <!-- <p class="text-center mb-0"><i class="fe fe-facebook text-primary me-3"></i><i
-              class="fe fe-instagram text-secondary me-3"></i><i class="fe fe-globe text-info me-3"></i></p> -->
             </div>
           </div>
         </a>
       </div>
+
     </div>
   </div>
 </div>
-
-   
